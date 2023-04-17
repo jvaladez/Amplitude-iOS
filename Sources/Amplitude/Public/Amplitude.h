@@ -25,12 +25,13 @@
 #import "AMPIdentify.h"
 #import "AMPRevenue.h"
 #import "AMPTrackingOptions.h"
+#import "AMPPlan.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NSString *_Nonnull (^AMPAdSupportBlock)(void);
 typedef NSDictionary *_Nullable (^AMPLocationInfoBlock)(void);
-
+typedef void (^AMPInitCompletionBlock)(void);
 /**
  Amplitude iOS SDK.
 
@@ -180,6 +181,17 @@ typedef NSDictionary *_Nullable (^AMPLocationInfoBlock)(void);
  Content-Type header for event sending requests. Only relevant for sending events to a different URL (e.g. proxy server)
  */
 @property (nonatomic, copy, readonly) NSString *contentTypeHeader;
+
+/**
+ * Sets a block to be called after completely initialized.
+ *
+ * Example:
+ *  __typeof(amp) __weak weakAmp = amp;
+ *  amp.initCompletionBlock = ^(void){
+ *     NSLog(@"deviceId: %@, userId: %@", weakAmp.deviceId, weakAmp.userId);
+ *  };
+ */
+@property (nonatomic, strong, nullable) AMPInitCompletionBlock initCompletionBlock;
 
 #pragma mark - Methods
 
@@ -623,6 +635,8 @@ typedef NSDictionary *_Nullable (^AMPLocationInfoBlock)(void);
 - (void)setContentTypeHeader:(NSString *)contentType;
 
 - (void)setBearerToken:(NSString *)token;
+
+- (void)setPlan:(AMPPlan *)plan;
 
 /**-----------------------------------------------------------------------------
  * @name Other Methods

@@ -59,6 +59,7 @@
 #import "AMPIdentify.h"
 #import "AMPRevenue.h"
 #import "AMPTrackingOptions.h"
+#import "AMPPlan.h"
 #import <math.h>
 #import <CommonCrypto/CommonDigest.h>
 
@@ -133,6 +134,7 @@ static NSString *const SEQUENCE_NUMBER = @"sequence_number";
 
     NSString *_serverUrl;
     NSString *_token;
+    AMPPlan *_plan;
 }
 
 #pragma clang diagnostic push
@@ -438,6 +440,9 @@ static NSString *const SEQUENCE_NUMBER = @"sequence_number";
             } else {
                 self.userId = [self.dbHelper getValue:USER_ID];
             }
+            if (self.initCompletionBlock != nil) {
+                self.initCompletionBlock();
+            }
         }];
 
         // Normally _inForeground is set by the enterForeground callback, but initializeWithApiKey will be called after the app's enterForeground
@@ -655,6 +660,10 @@ static NSString *const SEQUENCE_NUMBER = @"sequence_number";
     [event setValue:library forKey:@"library"];
     [event setValue:[AMPUtils generateUUID] forKey:@"uuid"];
     [event setValue:[NSNumber numberWithLongLong:[self getNextSequenceNumber]] forKey:@"sequence_number"];
+    
+    if (_plan) {
+        [event setValue:[_plan toNSDictionary] forKey:@"plan"];
+    }
 
     NSMutableDictionary *apiProperties = [event valueForKey:@"api_properties"];
 
@@ -1417,6 +1426,10 @@ static NSString *const SEQUENCE_NUMBER = @"sequence_number";
 
 - (void)useAdvertisingIdForDeviceId {
     _useAdvertisingIdForDeviceId = YES;
+}
+
+- (void)setPlan:(AMPPlan *)plan {
+    _plan = plan;
 }
 
 #pragma mark - Getters for device data
